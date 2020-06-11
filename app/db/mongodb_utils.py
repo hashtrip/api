@@ -6,14 +6,14 @@ from .mongodb import db
 
 
 async def connect_to_mongo():
-    logging.info("连接数据库中...")
+    logging.info("Connecting to the database...")
     db.client = AsyncIOMotorClient(str(MONGODB_URL),
                                    maxPoolSize=MAX_CONNECTIONS_COUNT,
                                    minPoolSize=MIN_CONNECTIONS_COUNT)
-    logging.info("连接数据库成功！")
+    logging.info("Successfully connected to the database!")
 
 
 async def close_mongo_connection():
-    logging.info("关闭数据库连接...")
+    logging.info("Closing the database connection...")
     db.client.close()
-    logging.info("数据库连接关闭！")
+    logging.info("The database connection is closed!")

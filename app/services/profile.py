@@ -1,46 +1,51 @@
 from typing import Optional
-
 from starlette.exceptions import HTTPException
-from starlette.status import HTTP_404_NOT_FOUND
+from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
-from ..services.user import get_user
+from ..models.profile import ProfileInResponse
+from ..models.user import User
 from ..db.mongodb import AsyncIOMotorClient
-from ..core.config import database_name, followers_collection_name
-from ..models.profile import Profile
+from ..db.repositories.profile_repository import get_profile_by_username, follow_for_user, unfollow_user
 
+async def get_profile_service(user: Optional[User], username:str, conn: AsyncIOMotorClient):
+    profile = await get_profile_by_username(conn, username, user.username if user else None)
+    return ProfileInResponse(profile=profile)
 
-async def is_following_for_user(
-    conn: AsyncIOMotorClient, current_username: str, target_username: str
-) -> bool:
-    count = await conn[database_name][followers_collection_name].count_documents({"follower": current_username,
-                                                                                  "following": target_username})
-    return count > 0
-
-
-async def follow_for_user(
-    conn: AsyncIOMotorClient, current_username: str, target_username: str
-):
-    await conn[database_name][followers_collection_name].insert_one({"follower": current_username,
-                                                                     "following": target_username})
-
-
-async def unfollow_user(conn: AsyncIOMotorClient, current_username: str, target_username: str):
-    await conn[database_name][followers_collection_name].delete_many({"follower": current_username,
-                                                                     "following": target_username})
-
-
-async def get_profile_for_user(
-    conn: AsyncIOMotorClient, target_username: str, current_username: Optional[str] = None
-) -> Profile:
-    user = await get_user(conn, target_username)
-    if not user:
+async def follow_user_service(user: User, username:str, conn: AsyncIOMotorClient):
+    if username == user.username:
         raise HTTPException(
-            status_code=HTTP_404_NOT_FOUND, detail=f"User {target_username} not found"
+            status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"User can not follow them self",
         )
 
-    profile = Profile(**user.dict())
-    profile.following = await is_following_for_user(
-        conn, current_username, target_username
-    )
+    profile = await get_profile_by_username(conn, username, user.username)
+    if profile.following:
+        raise HTTPException(
+            status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"You follow this user already",
+        )
 
-    return profile
+    await follow_for_user(conn, user.username, profile.username)
+    profile.following = True
+
+    return ProfileInResponse(profile=profile)
+
+async def unfollow_user_service(user: User, username: str, conn: AsyncIOMotorClient):
+    if username == user.username:
+        raise HTTPException(
+            status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"User can not describe from them self",
+        )
+
+    profile = await get_profile_by_username(conn, username, user.username)
+
+    if not profile.following:
+        raise HTTPException(
+            status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"You did not follow this user",
+        )
+
+    await unfollow_user(conn, user.username, profile.username)
+    profile.following = False
+
+    return ProfileInResponse(profile=profile)

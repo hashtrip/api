@@ -2,6 +2,14 @@ HashTrip Backend
 ---------- 
 
 
+Requirments
+----------
+
+- MongoDB community @4.2
+- python3 ^3.7.1
+- Requirments.txt
+
+
 Quickstart
 ----------
 
@@ -55,6 +63,7 @@ Files related to application are in the ``app`` directory. ``alembic`` is direct
 Application parts are:
 
 ::
+
     app
     ├── api              - web related stuff and handle routes.
     │   ├── dependencies - dependencies for routes definition.

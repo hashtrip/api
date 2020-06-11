@@ -2,14 +2,18 @@ version: '3'
 
 services:
   db:
-    image: mongodb
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
     env_file:
       - .env
+    ports:
+      - 27017:27017
   web_app:
     build:
       dockerfile: Dockerfile
       context: .
-    image: hashtrip/backend-api-app
+    image: hashtrip/backend
     env_file:
       - .env
     depends_on:

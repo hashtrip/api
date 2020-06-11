@@ -11,7 +11,7 @@ from ..models.article import (
 )
 from ..db.mongodb import AsyncIOMotorClient
 from ..core.config import database_name, favorites_collection_name, users_collection_name, article_collection_name
-from .profile import get_profile_for_user
+from .profile import get_profile_service
 from .tag import (
     create_tags_that_not_exist,
     get_tags_for_article
@@ -70,7 +70,7 @@ async def get_article_by_slug(
     if article_doc:
         article_doc["favorites_count"] = await get_favorites_count_for_article(conn, slug)
         article_doc["favorited"] = await is_article_favorited_by_user(conn, slug, username)
-        article_doc["author"] = await get_profile_for_user(conn, article_doc["author_id"])
+        article_doc["author"] = await get_profile_service(conn, article_doc["author_id"])
 
         return ArticleInDB(
             **article_doc,
@@ -91,7 +91,7 @@ async def create_article_by_slug(
     if article.tag_list:
         await create_tags_that_not_exist(conn, article.tag_list)
 
-    author = await get_profile_for_user(conn, username, "")
+    author = await get_profile_service(conn, username, "")
     return ArticleInDB(
         **article_doc,
         created_at=ObjectId(article_doc["_id"]).generation_time,
@@ -137,7 +137,7 @@ async def get_user_articles(
                                                                        limit=limit, skip=offset)
     async for row in article_docs:
         slug = row["slug"]
-        author = await get_profile_for_user(conn, row["author_id"], username)
+        author = await get_profile_service(conn, row["author_id"], username)
         tags = await get_tags_for_article(conn, slug)
         favorites_count = await get_favorites_count_for_article(conn, slug)
         favorited_by_user = await is_article_favorited_by_user(conn, slug, username)
@@ -174,7 +174,7 @@ async def get_articles_with_filters(
 
     async for row in rows:
         slug = row["slug"]
-        author = await get_profile_for_user(conn, row["author_id"], username)
+        author = await get_profile_service(conn, row["author_id"], username)
         tags = await get_tags_for_article(conn, slug)
         favorites_count = await get_favorites_count_for_article(conn, slug)
         favorited_by_user = await is_article_favorited_by_user(conn, slug, username)

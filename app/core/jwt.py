@@ -7,7 +7,7 @@ from jwt import PyJWTError
 from starlette.exceptions import HTTPException
 from starlette.status import HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
 
-from ..services.user import get_user
+from ..db.repositories.user_repository import get_user
 from ..db.mongodb import AsyncIOMotorClient, get_database
 from ..models.token import TokenPayload
 from ..models.user import User

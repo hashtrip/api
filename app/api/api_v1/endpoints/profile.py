@@ -5,10 +5,10 @@ from starlette.exceptions import HTTPException
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
 from ....core.jwt import get_current_user_authorizer
-from ....services.profile import follow_for_user, get_profile_for_user, unfollow_user
 from ....db.mongodb import AsyncIOMotorClient, get_database
 from ....models.profile import ProfileInResponse
 from ....models.user import User
+from ....services.profile import get_profile_service, follow_user_service, unfollow_user_service
 
 router = APIRouter()
 
@@ -19,11 +19,7 @@ async def retrieve_profile(
     user: Optional[User] = Depends(get_current_user_authorizer(required=False)),
     db: AsyncIOMotorClient = Depends(get_database),
 ):
-    profile = await get_profile_for_user(
-        db, username, user.username if user else None
-    )
-    profile = ProfileInResponse(profile=profile)
-    return profile
+    return await get_profile_service(user=user, username=username, conn=db)
 
 
 @router.post(
@@ -34,24 +30,7 @@ async def follow_user(
     user: User = Depends(get_current_user_authorizer()),
     db: AsyncIOMotorClient = Depends(get_database),
 ):
-    if username == user.username:
-        raise HTTPException(
-            status_code=HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"User can not follow them self",
-        )
-
-    profile = await get_profile_for_user(db, username, user.username)
-
-    if profile.following:
-        raise HTTPException(
-            status_code=HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"You follow this user already",
-        )
-
-    await follow_for_user(db, user.username, profile.username)
-    profile.following = True
-
-    return ProfileInResponse(profile=profile)
+    return await follow_user_service(user=user, username=username, conn=db) 
 
 
 @router.delete(
@@ -62,21 +41,4 @@ async def describe_from_user(
     user: User = Depends(get_current_user_authorizer()),
     db: AsyncIOMotorClient = Depends(get_database),
 ):
-    if username == user.username:
-        raise HTTPException(
-            status_code=HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"User can not describe from them self",
-        )
-
-    profile = await get_profile_for_user(db, username, user.username)
-
-    if not profile.following:
-        raise HTTPException(
-            status_code=HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"You did not follow this user",
-        )
-
-    await unfollow_user(db, user.username, profile.username)
-    profile.following = False
-
-    return ProfileInResponse(profile=profile)
+    return await unfollow_user_service(username=username, user=user, conn=db)

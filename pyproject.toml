@@ -1,21 +1,16 @@
 [tool.poetry]
-name = "hashtrip backend API app"
+name = "hashtrip"
 version = "0.1.0"
 description = "Backend API app for hashtrip"
-authors = ["rizanw <rzkandre@gmail.com"]
+authors = ["rizanw <rzkandre@gmail.com>", "anggar <anggarwahyu@gmail.com>"]
 license = "MIT"
-
-
-[[tool.poetry.source]]
-name = 'tsinghua'
-url = 'https://pypi.tuna.tsinghua.edu.cn/simple'
 
 [tool.poetry.dependencies]
 python = "^3.7"
-uvicorn = "^0.6.1"
+uvicorn = "^0.11.5"
 gunicorn = "^19.9"
-fastapi = "^0.29"
-pydantic = {version = "^0.26.0",extras = ["email"]}
+fastapi = "^0.54.0"
+pydantic = {version = "^1.2", extras = ["email"]}
 passlib = {version = "^1.7",extras = ["bcrypt"]}
 pyjwt = "^1.7"
 alembic = "^1.0"
