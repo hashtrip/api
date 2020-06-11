@@ -1,0 +1,16 @@
+dist: xenial
+language: python
+python: 3.7
+install:
+  - poetry install
+before_install:
+  - docker build -t markqiu/fastapi-realworld .
+
+  - pip install poetry
+before_script:
+  - mongo -c 'create database testing_db;' -U postgres
+  - alembic upgrade head
+script:
+  - uvicorn app.main:app & APIURL=http://localhost:8000/api ./postman_tests/run-api-tests.sh
+services:
+  - mongodb
