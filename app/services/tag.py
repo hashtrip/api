@@ -2,7 +2,7 @@ from typing import List
 
 from ..db.mongodb import AsyncIOMotorClient
 from ..models.tag import TagInDB
-from ..core.config import database_name, tags_collection_name, article_collection_name
+from ..core.config import database_name, tags_collection_name, place_collection_name
 
 
 async def fetch_all_tags(conn: AsyncIOMotorClient) -> List[TagInDB]:
@@ -14,11 +14,11 @@ async def fetch_all_tags(conn: AsyncIOMotorClient) -> List[TagInDB]:
     return tags
 
 
-async def get_tags_for_article(conn: AsyncIOMotorClient, slug: str) -> List[TagInDB]:
+async def get_tags_for_place(conn: AsyncIOMotorClient, slug: str) -> List[TagInDB]:
     tags = []
-    article_tags = await conn[database_name][article_collection_name].find_one({"slug": slug},
+    place_tags = await conn[database_name][place_collection_name].find_one({"slug": slug},
                                                                                projection={"tag_list": True})
-    for row in article_tags["tag_list"]:
+    for row in place_tags["tag_list"]:
         tags.append(TagInDB({"tag": row}))
 
     return tags

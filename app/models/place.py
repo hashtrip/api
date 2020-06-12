@@ -7,7 +7,7 @@ from .profile import Profile
 from .rwmodel import RWModel
 
 
-class ArticleFilterParams(RWModel):
+class PlaceFilterParams(RWModel):
     tag: str = ""
     author: str = ""
     favorited: str = ""
@@ -15,38 +15,38 @@ class ArticleFilterParams(RWModel):
     offset: int = 0
 
 
-class ArticleBase(RWModel):
+class PlaceBase(RWModel):
     title: str
     description: str
     body: str
     tag_list: List[str] = Schema([], alias="tagList")
 
 
-class Article(DateTimeModelMixin, ArticleBase):
+class Place(DateTimeModelMixin, PlaceBase):
     slug: str
     author: Profile
     favorited: bool
     favorites_count: int = Schema(..., alias="favoritesCount")
 
 
-class ArticleInDB(DBModelMixin, Article):
+class PlaceInDB(DBModelMixin, Place):
     pass
 
 
-class ArticleInResponse(RWModel):
-    article: Article
+class PlaceInResponse(RWModel):
+    Place: Place
 
 
-class ManyArticlesInResponse(RWModel):
-    articles: List[Article]
-    articles_count: int = Schema(..., alias="articlesCount")
+class ManyPlacesInResponse(RWModel):
+    Places: List[Place]
+    Places_count: int = Schema(..., alias="PlacesCount")
 
 
-class ArticleInCreate(ArticleBase):
+class PlaceInCreate(PlaceBase):
     pass
 
 
-class ArticleInUpdate(RWModel):
+class PlaceInUpdate(RWModel):
     title: Optional[str] = None
     description: Optional[str] = None
     body: Optional[str] = None

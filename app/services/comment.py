@@ -7,7 +7,7 @@ from ..core.config import comments_collection_name, database_name
 from .profile import get_profile_service
 
 
-async def get_comments_for_article(
+async def get_comments_for_place(
     conn: AsyncIOMotorClient, slug: str, username: Optional[str] = None
 ) -> List[CommentInDB]:
     comments: List[CommentInDB] = []
