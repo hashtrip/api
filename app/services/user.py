@@ -10,9 +10,19 @@ from starlette.status import (
     HTTP_422_UNPROCESSABLE_ENTITY,
 )
 from ..core.jwt import create_access_token
-from ..core.config import database_name, users_collection_name, ACCESS_TOKEN_EXPIRE_MINUTES
+from ..core.config import (
+    database_name,
+    users_collection_name,
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+)
 from ..models.user import UserInCreate, UserInDB, UserInUpdate, UserInResponse, User
-from ..db.repositories.user_repository import create_user, get_user, get_user_by_email, update_user
+from ..db.repositories.user_repository import (
+    create_user,
+    get_user,
+    get_user_by_email,
+    update_user,
+)
+
 
 async def create_user_service(user: UserInCreate, conn: AsyncIOMotorClient):
     await check_free_username_and_email(conn, user.username, user.email)
@@ -26,8 +36,11 @@ async def create_user_service(user: UserInCreate, conn: AsyncIOMotorClient):
 
             return UserInResponse(user=User(**dbuser.dict(), token=token))
 
+
 async def check_free_username_and_email(
-        conn: AsyncIOMotorClient, username: Optional[str] = None, email: Optional[EmailStr] = None
+    conn: AsyncIOMotorClient,
+    username: Optional[str] = None,
+    email: Optional[EmailStr] = None,
 ):
     if username:
         user_by_username = await get_user(conn, username)
@@ -43,4 +56,3 @@ async def check_free_username_and_email(
                 status_code=HTTP_422_UNPROCESSABLE_ENTITY,
                 detail="User with this email already exists",
             )
-

@@ -36,9 +36,7 @@ async def create_comment_for_place(
 
 
 @router.get(
-    "/places/{slug}/comments",
-    response_model=ManyCommentsInResponse,
-    tags=["comments"],
+    "/places/{slug}/comments", response_model=ManyCommentsInResponse, tags=["comments"],
 )
 async def get_comment_from_place(
     slug: str = Path(..., min_length=1),

@@ -29,7 +29,8 @@ def _get_authorization_token(authorization: str = Header(...)):
 
 
 async def _get_current_user(
-    db: AsyncIOMotorClient = Depends(get_database), token: str = Depends(_get_authorization_token)
+    db: AsyncIOMotorClient = Depends(get_database),
+    token: str = Depends(_get_authorization_token),
 ) -> User:
     try:
         payload = jwt.decode(token, str(SECRET_KEY), algorithms=[ALGORITHM])

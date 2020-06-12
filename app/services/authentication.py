@@ -7,6 +7,7 @@ from ..models.user import UserInLogin, UserInResponse, User
 from ..core.config import ACCESS_TOKEN_EXPIRE_MINUTES
 from ..core.jwt import create_access_token
 
+
 async def authentication_service(request: UserInLogin, conn: AsyncIOMotorClient):
     user = await get_user_by_email(conn, request.email)
     print(user)

@@ -5,13 +5,23 @@ from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 from ..models.profile import ProfileInResponse
 from ..models.user import User
 from ..db.mongodb import AsyncIOMotorClient
-from ..db.repositories.profile_repository import get_profile_by_username, follow_for_user, unfollow_user
+from ..db.repositories.profile_repository import (
+    get_profile_by_username,
+    follow_for_user,
+    unfollow_user,
+)
 
-async def get_profile_service(user: Optional[User], username:str, conn: AsyncIOMotorClient):
-    profile = await get_profile_by_username(conn, username, user.username if user else None)
+
+async def get_profile_service(
+    user: Optional[User], username: str, conn: AsyncIOMotorClient
+):
+    profile = await get_profile_by_username(
+        conn, username, user.username if user else None
+    )
     return ProfileInResponse(profile=profile)
 
-async def follow_user_service(user: User, username:str, conn: AsyncIOMotorClient):
+
+async def follow_user_service(user: User, username: str, conn: AsyncIOMotorClient):
     if username == user.username:
         raise HTTPException(
             status_code=HTTP_422_UNPROCESSABLE_ENTITY,
@@ -29,6 +39,7 @@ async def follow_user_service(user: User, username:str, conn: AsyncIOMotorClient
     profile.following = True
 
     return ProfileInResponse(profile=profile)
+
 
 async def unfollow_user_service(user: User, username: str, conn: AsyncIOMotorClient):
     if username == user.username:

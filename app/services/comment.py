@@ -11,7 +11,9 @@ async def get_comments_for_place(
     conn: AsyncIOMotorClient, slug: str, username: Optional[str] = None
 ) -> List[CommentInDB]:
     comments: List[CommentInDB] = []
-    rows = conn[database_name][comments_collection_name].find({"slug": slug, "username": username})
+    rows = conn[database_name][comments_collection_name].find(
+        {"slug": slug, "username": username}
+    )
     async for row in rows:
         author = await get_profile_service(conn, row["username"], username)
         comments.append(CommentInDB(**row, author=author))
@@ -30,4 +32,6 @@ async def create_comment(
 
 
 async def delete_comment(conn: AsyncIOMotorClient, id: int, username: str):
-    await conn[database_name][comments_collection_name].delete_many({"id": id, "username": username})
+    await conn[database_name][comments_collection_name].delete_many(
+        {"id": id, "username": username}
+    )

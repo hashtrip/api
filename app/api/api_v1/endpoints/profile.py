@@ -8,7 +8,11 @@ from ....core.jwt import get_current_user_authorizer
 from ....db.mongodb import AsyncIOMotorClient, get_database
 from ....models.profile import ProfileInResponse
 from ....models.user import User
-from ....services.profile import get_profile_service, follow_user_service, unfollow_user_service
+from ....services.profile import (
+    get_profile_service,
+    follow_user_service,
+    unfollow_user_service,
+)
 
 router = APIRouter()
 
@@ -30,7 +34,7 @@ async def follow_user(
     user: User = Depends(get_current_user_authorizer()),
     db: AsyncIOMotorClient = Depends(get_database),
 ):
-    return await follow_user_service(user=user, username=username, conn=db) 
+    return await follow_user_service(user=user, username=username, conn=db)
 
 
 @router.delete(

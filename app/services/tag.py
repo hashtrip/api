@@ -16,8 +16,9 @@ async def fetch_all_tags(conn: AsyncIOMotorClient) -> List[TagInDB]:
 
 async def get_tags_for_place(conn: AsyncIOMotorClient, slug: str) -> List[TagInDB]:
     tags = []
-    place_tags = await conn[database_name][place_collection_name].find_one({"slug": slug},
-                                                                               projection={"tag_list": True})
+    place_tags = await conn[database_name][place_collection_name].find_one(
+        {"slug": slug}, projection={"tag_list": True}
+    )
     for row in place_tags["tag_list"]:
         tags.append(TagInDB({"tag": row}))
 
@@ -25,4 +26,6 @@ async def get_tags_for_place(conn: AsyncIOMotorClient, slug: str) -> List[TagInD
 
 
 async def create_tags_that_not_exist(conn: AsyncIOMotorClient, tags: List[str]):
-    await conn[database_name][tags_collection_name].insert_many([{"tag": tag} for tag in tags])
+    await conn[database_name][tags_collection_name].insert_many(
+        [{"tag": tag} for tag in tags]
+    )

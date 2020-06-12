@@ -42,13 +42,13 @@ router = APIRouter()
 
 @router.get("/places", response_model=ManyPlacesInResponse, tags=["places"])
 async def get_places(
-        tag: str = "",
-        author: str = "",
-        favorited: str = "",
-        limit: int = Query(20, gt=0),
-        offset: int = Query(0, ge=0),
-        user: User = Depends(get_current_user_authorizer(required=False)),
-        db: AsyncIOMotorClient = Depends(get_database),
+    tag: str = "",
+    author: str = "",
+    favorited: str = "",
+    limit: int = Query(20, gt=0),
+    offset: int = Query(0, ge=0),
+    user: User = Depends(get_current_user_authorizer(required=False)),
+    db: AsyncIOMotorClient = Depends(get_database),
 ):
     filters = PlaceFilterParams(
         tag=tag, author=author, favorited=favorited, limit=limit, offset=offset
@@ -63,10 +63,10 @@ async def get_places(
 
 @router.get("/places/feed", response_model=ManyPlacesInResponse, tags=["places"])
 async def places_feed(
-        limit: int = Query(20, gt=0),
-        offset: int = Query(0, ge=0),
-        user: User = Depends(get_current_user_authorizer()),
-        db: AsyncIOMotorClient = Depends(get_database),
+    limit: int = Query(20, gt=0),
+    offset: int = Query(0, ge=0),
+    user: User = Depends(get_current_user_authorizer()),
+    db: AsyncIOMotorClient = Depends(get_database),
 ):
     dbplaces = await get_user_places(db, user.username, limit, offset)
     return create_aliased_response(
@@ -76,13 +76,11 @@ async def places_feed(
 
 @router.get("/places/{slug}", response_model=PlaceInResponse, tags=["places"])
 async def get_place(
-        slug: str = Path(..., min_length=1),
-        user: Optional[User] = Depends(get_current_user_authorizer(required=False)),
-        db: AsyncIOMotorClient = Depends(get_database),
+    slug: str = Path(..., min_length=1),
+    user: Optional[User] = Depends(get_current_user_authorizer(required=False)),
+    db: AsyncIOMotorClient = Depends(get_database),
 ):
-    dbplace = await get_place_by_slug(
-        db, slug, user.username if user else None
-    )
+    dbplace = await get_place_by_slug(db, slug, user.username if user else None)
     if not dbplace:
         raise HTTPException(
             status_code=HTTP_404_NOT_FOUND,
@@ -99,13 +97,11 @@ async def get_place(
     status_code=HTTP_201_CREATED,
 )
 async def create_new_place(
-        place: PlaceInCreate = Body(..., embed=True),
-        user: User = Depends(get_current_user_authorizer()),
-        db: AsyncIOMotorClient = Depends(get_database),
+    place: PlaceInCreate = Body(..., embed=True),
+    user: User = Depends(get_current_user_authorizer()),
+    db: AsyncIOMotorClient = Depends(get_database),
 ):
-    place_by_slug = await get_place_by_slug(
-        db, slugify(place.title), user.username
-    )
+    place_by_slug = await get_place_by_slug(db, slugify(place.title), user.username)
     if place_by_slug:
         raise HTTPException(
             status_code=HTTP_422_UNPROCESSABLE_ENTITY,
@@ -118,14 +114,12 @@ async def create_new_place(
 
 @router.put("/places/{slug}", response_model=PlaceInResponse, tags=["places"])
 async def update_place(
-        slug: str = Path(..., min_length=1),
-        place: PlaceInUpdate = Body(..., embed=True),
-        user: User = Depends(get_current_user_authorizer()),
-        db: AsyncIOMotorClient = Depends(get_database),
+    slug: str = Path(..., min_length=1),
+    place: PlaceInUpdate = Body(..., embed=True),
+    user: User = Depends(get_current_user_authorizer()),
+    db: AsyncIOMotorClient = Depends(get_database),
 ):
-    await check_place_for_existence_and_modifying_permissions(
-        db, slug, user.username
-    )
+    await check_place_for_existence_and_modifying_permissions(db, slug, user.username)
 
     dbplace = await update_place_by_slug(db, slug, place, user.username)
     return create_aliased_response(PlaceInResponse(place=dbplace))
@@ -133,24 +127,20 @@ async def update_place(
 
 @router.delete("/places/{slug}", tags=["places"], status_code=HTTP_204_NO_CONTENT)
 async def delete_place(
-        slug: str = Path(..., min_length=1),
-        user: User = Depends(get_current_user_authorizer()),
-        db: AsyncIOMotorClient = Depends(get_database),
+    slug: str = Path(..., min_length=1),
+    user: User = Depends(get_current_user_authorizer()),
+    db: AsyncIOMotorClient = Depends(get_database),
 ):
-    await check_place_for_existence_and_modifying_permissions(
-        db, slug, user.username
-    )
+    await check_place_for_existence_and_modifying_permissions(db, slug, user.username)
 
     await delete_place_by_slug(db, slug, user.username)
 
 
-@router.post(
-    "/places/{slug}/favorite", response_model=PlaceInResponse, tags=["places"]
-)
+@router.post("/places/{slug}/favorite", response_model=PlaceInResponse, tags=["places"])
 async def favorite_place(
-        slug: str = Path(..., min_length=1),
-        user: User = Depends(get_current_user_authorizer()),
-        db: AsyncIOMotorClient = Depends(get_database),
+    slug: str = Path(..., min_length=1),
+    user: User = Depends(get_current_user_authorizer()),
+    db: AsyncIOMotorClient = Depends(get_database),
 ):
     dbplace = await get_place_or_404(db, slug, user.username)
     if dbplace.favorited:
@@ -170,9 +160,9 @@ async def favorite_place(
     "/places/{slug}/favorite", response_model=PlaceInResponse, tags=["places"]
 )
 async def delete_place_from_favorites(
-        slug: str = Path(..., min_length=1),
-        user: User = Depends(get_current_user_authorizer()),
-        db: AsyncIOMotorClient = Depends(get_database),
+    slug: str = Path(..., min_length=1),
+    user: User = Depends(get_current_user_authorizer()),
+    db: AsyncIOMotorClient = Depends(get_database),
 ):
     dbplace = await get_place_or_404(db, slug, user.username)
 

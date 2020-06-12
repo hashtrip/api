@@ -15,7 +15,9 @@ from ..models.place import PlaceInDB
 
 
 async def check_free_username_and_email(
-        conn: AsyncIOMotorClient, username: Optional[str] = None, email: Optional[EmailStr] = None
+    conn: AsyncIOMotorClient,
+    username: Optional[str] = None,
+    email: Optional[EmailStr] = None,
 ):
     if username:
         user_by_username = await get_user(conn, username)
@@ -34,7 +36,7 @@ async def check_free_username_and_email(
 
 
 async def get_place_or_404(
-        conn: AsyncIOMotorClient, slug: str, username: Optional[str] = None
+    conn: AsyncIOMotorClient, slug: str, username: Optional[str] = None
 ) -> PlaceInDB:
     searched_place = await get_place_by_slug(conn, slug, username)
     if not searched_place:
@@ -46,7 +48,7 @@ async def get_place_or_404(
 
 
 async def check_place_for_existence_and_modifying_permissions(
-        conn: AsyncIOMotorClient, slug: str, username: str = ""
+    conn: AsyncIOMotorClient, slug: str, username: str = ""
 ):
     searched_place = await get_place_by_slug(conn, slug, username)
     if not searched_place:

@@ -1,4 +1,3 @@
-from datetime import timedelta
 
 from fastapi import APIRouter, Body, Depends
 from starlette.exceptions import HTTPException
@@ -19,10 +18,11 @@ router = APIRouter()
 
 @router.post("/users/login", response_model=UserInResponse, tags=["authentication"])
 async def login(
-    user: UserInLogin = Body(..., embed=True), 
-    db: AsyncIOMotorClient = Depends(get_database)
+        user: UserInLogin = Body(..., embed=True),
+        db: AsyncIOMotorClient = Depends(get_database),
 ):
-    return await authentication_service(request=user,conn=db) 
+    return await authentication_service(request=user, conn=db)
+
 
 @router.post(
     "/users",
@@ -31,7 +31,7 @@ async def login(
     status_code=HTTP_201_CREATED,
 )
 async def register(
-    user: UserInCreate = Body(..., embed=True), 
-    db: AsyncIOMotorClient = Depends(get_database)
+        user: UserInCreate = Body(..., embed=True),
+        db: AsyncIOMotorClient = Depends(get_database),
 ):
     return await create_user_service(user=user, conn=db)
