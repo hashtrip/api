@@ -23,6 +23,7 @@ motor = "^2.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "*"
+black = "^19.10b0"
 
 [tool.black]
 exclued = '''
