@@ -20,12 +20,18 @@ async def get_tags_for_place(conn: AsyncIOMotorClient, slug: str) -> List[TagInD
         {"slug": slug}, projection={"tag_list": True}
     )
     for row in place_tags["tag_list"]:
-        tags.append(TagInDB({"tag": row}))
+        tags.append(TagInDB(tag={"tag": row}))
 
     return tags
 
 
 async def create_tags_that_not_exist(conn: AsyncIOMotorClient, tags: List[str]):
-    await conn[database_name][tags_collection_name].insert_many(
-        [{"tag": tag} for tag in tags]
+    dbconn = conn[database_name][tags_collection_name]
+    existing = await dbconn.find({}, projection={"_id": False}).to_list(None)
+    existing = map(lambda x: x["tag"], existing)
+
+    filtered = list(filter(lambda x: x not in existing, tags))
+
+    await dbconn.insert_many(
+        [{"tag": tag} for tag in filtered]
     )
