@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from pydantic import Schema
+from pydantic import Field
 
 from .dbmodel import DateTimeModelMixin, DBModelMixin
 from .profile import Profile
@@ -18,15 +18,16 @@ class PlaceFilterParams(RWModel):
 class PlaceBase(RWModel):
     title: str
     description: str
+    location: str
     body: str
-    tag_list: List[str] = Schema([], alias="tagList")
+    tag_list: List[str] = Field([], alias="tagList")
 
 
 class Place(DateTimeModelMixin, PlaceBase):
     slug: str
     author: Profile
     favorited: bool
-    favorites_count: int = Schema(..., alias="favoritesCount")
+    favorites_count: int = Field(..., alias="favoritesCount")
 
 
 class PlaceInDB(DBModelMixin, Place):
@@ -34,12 +35,12 @@ class PlaceInDB(DBModelMixin, Place):
 
 
 class PlaceInResponse(RWModel):
-    Place: Place
+    place: Place
 
 
 class ManyPlacesInResponse(RWModel):
-    Places: List[Place]
-    Places_count: int = Schema(..., alias="PlacesCount")
+    places: List[Place]
+    places_count: int = Field(..., alias="PlacesCount")
 
 
 class PlaceInCreate(PlaceBase):
@@ -50,4 +51,4 @@ class PlaceInUpdate(RWModel):
     title: Optional[str] = None
     description: Optional[str] = None
     body: Optional[str] = None
-    tag_list: List[str] = Schema([], alias="tagList")
+    tag_list: List[str] = Field([], alias="tagList")

@@ -1,6 +1,5 @@
 from typing import List, Optional
 from bson import ObjectId
-from fastapi import Query
 from slugify import slugify
 from datetime import datetime
 
@@ -11,13 +10,13 @@ from ..models.place import (
     PlaceInUpdate,
 )
 from ..db.mongodb import AsyncIOMotorClient
+from ..db.repositories.profile_repository import get_profile_by_username
 from ..core.config import (
     database_name,
     favorites_collection_name,
     users_collection_name,
     place_collection_name,
 )
-from .profile import get_profile_service
 from .tag import create_tags_that_not_exist, get_tags_for_place
 
 
@@ -101,7 +100,7 @@ async def get_place_by_slug(
     if place_doc:
         place_doc["favorites_count"] = await get_favorites_count_for_place(conn, slug)
         place_doc["favorited"] = await is_place_favorited_by_user(conn, slug, username)
-        place_doc["author"] = await get_profile_service(conn, place_doc["author_id"])
+        place_doc["author"] = await get_profile_by_username(conn, target_username=place_doc["author_id"])
 
         return PlaceInDB(
             **place_doc, created_at=ObjectId(place_doc["_id"]).generation_time
@@ -135,7 +134,7 @@ async def create_place_by_slug(
     if place.tag_list:
         await create_tags_that_not_exist(conn, place.tag_list)
 
-    author = await get_profile_service(conn, username, "")
+    author = await get_profile_by_username(conn, target_username=username)
     return PlaceInDB(
         **place_doc,
         created_at=ObjectId(place_doc["_id"]).generation_time,
@@ -185,8 +184,8 @@ async def get_user_places(
     )
     async for row in place_docs:
         slug = row["slug"]
-        author = await get_profile_service(conn, row["author_id"], username)
-        tags = await get_tags_for_place(conn, slug)
+        author = await get_profile_by_username(conn, target_username=row["author_id"])
+        await get_tags_for_place(conn, slug)
         favorites_count = await get_favorites_count_for_place(conn, slug)
         favorited_by_user = await is_place_favorited_by_user(conn, slug, username)
         places.append(
@@ -222,8 +221,8 @@ async def get_places_with_filters(
 
     async for row in rows:
         slug = row["slug"]
-        author = await get_profile_service(conn, row["author_id"], username)
-        tags = await get_tags_for_place(conn, slug)
+        author = await get_profile_by_username(conn, target_username=row["author_id"])
+        await get_tags_for_place(conn, slug)
         favorites_count = await get_favorites_count_for_place(conn, slug)
         favorited_by_user = await is_place_favorited_by_user(conn, slug, username)
         places.append(
