@@ -1,8 +1,6 @@
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Path
-from starlette.exceptions import HTTPException
-from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
 from ....core.jwt import get_current_user_authorizer
 from ....db.mongodb import AsyncIOMotorClient, get_database
@@ -23,7 +21,7 @@ async def retrieve_profile(
     user: Optional[User] = Depends(get_current_user_authorizer(required=False)),
     db: AsyncIOMotorClient = Depends(get_database),
 ):
-    return await get_profile_service(user=user, username=username, conn=db)
+    return await get_profile_service(current_user=user, username=username, conn=db)
 
 
 @router.post(

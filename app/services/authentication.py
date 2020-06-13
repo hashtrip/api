@@ -1,8 +1,8 @@
 from starlette.exceptions import HTTPException
-from starlette.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
+from starlette.status import HTTP_400_BAD_REQUEST
 from datetime import timedelta
 from ..db.mongodb import AsyncIOMotorClient
-from .user import create_user, get_user_by_email
+from .user import get_user_by_email
 from ..models.user import UserInLogin, UserInResponse, User
 from ..core.config import ACCESS_TOKEN_EXPIRE_MINUTES
 from ..core.jwt import create_access_token
@@ -10,7 +10,6 @@ from ..core.jwt import create_access_token
 
 async def authentication_service(request: UserInLogin, conn: AsyncIOMotorClient):
     user = await get_user_by_email(conn, request.email)
-    print(user)
     if not user or not user.check_password(request.password):
         raise HTTPException(
             status_code=HTTP_400_BAD_REQUEST, detail="Incorrect email or password"

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Body, Depends
 
 from ....core.jwt import get_current_user_authorizer
 from ....services.shortcuts import check_free_username_and_email
-from ....services.user import update_user
+from ....db.repositories.user_repository import update_user
 from ....db.mongodb import AsyncIOMotorClient, get_database
 from ....models.user import User, UserInResponse, UserInUpdate
 

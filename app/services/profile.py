@@ -13,10 +13,10 @@ from ..db.repositories.profile_repository import (
 
 
 async def get_profile_service(
-    user: Optional[User], username: str, conn: AsyncIOMotorClient
+    conn: AsyncIOMotorClient, *, username: str, current_user: Optional[User] = None
 ):
     profile = await get_profile_by_username(
-        conn, username, user.username if user else None
+        conn, username, current_user.username if current_user else None
     )
     return ProfileInResponse(profile=profile)
 

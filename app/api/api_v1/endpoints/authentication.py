@@ -1,14 +1,9 @@
 
 from fastapi import APIRouter, Body, Depends
-from starlette.exceptions import HTTPException
-from starlette.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
+from starlette.status import HTTP_201_CREATED
 
-from ....core.config import ACCESS_TOKEN_EXPIRE_MINUTES
-from ....core.jwt import create_access_token
-from ....services.shortcuts import check_free_username_and_email
-from ....services.user import create_user, get_user_by_email
 from ....db.mongodb import AsyncIOMotorClient, get_database
-from ....models.user import User, UserInCreate, UserInLogin, UserInResponse
+from ....models.user import UserInCreate, UserInLogin, UserInResponse
 
 from ....services.user import create_user_service
 from ....services.authentication import authentication_service

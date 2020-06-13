@@ -2,25 +2,19 @@ from typing import Optional
 from datetime import timedelta
 from ..db.mongodb import AsyncIOMotorClient
 from pydantic import EmailStr
-from bson.objectid import ObjectId
 from starlette.exceptions import HTTPException
 from starlette.status import (
-    HTTP_403_FORBIDDEN,
-    HTTP_404_NOT_FOUND,
     HTTP_422_UNPROCESSABLE_ENTITY,
 )
 from ..core.jwt import create_access_token
 from ..core.config import (
-    database_name,
-    users_collection_name,
     ACCESS_TOKEN_EXPIRE_MINUTES,
 )
-from ..models.user import UserInCreate, UserInDB, UserInUpdate, UserInResponse, User
+from ..models.user import User, UserInCreate, UserInResponse
 from ..db.repositories.user_repository import (
     create_user,
     get_user,
     get_user_by_email,
-    update_user,
 )
 
 
