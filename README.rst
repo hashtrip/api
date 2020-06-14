@@ -1,7 +1,7 @@
 Hashtrip Backend
 ---------- 
 
-Docs can be accessed in `/docs` endpoint, for example when in local dev environment, you can access it in [localhost:8000/docs](localhost:8000/docs)
+Docs can be accessed in ``/docs`` endpoint, for example when in local dev environment, you can access it in `localhost:8000/docs <(localhost:8000/docs>`_.
 
 Requirements
 ----------
