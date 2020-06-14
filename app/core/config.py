@@ -34,7 +34,9 @@ else:
 
 database_name = MONGO_DB
 place_collection_name = "places"
+post_collection_name = "posts"
 favorites_collection_name = "favorites"
+likes_collection_name = "likes"
 tags_collection_name = "tags"
 users_collection_name = "users"
 comments_collection_name = "commentaries"
