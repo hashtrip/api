@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from starlette.exceptions import HTTPException
 from starlette.status import HTTP_404_NOT_FOUND
@@ -35,6 +35,26 @@ async def is_following_for_user(
         {"follower": current_username, "following": target_username}
     )
     return count > 0
+
+
+async def get_followings(
+    conn: AsyncIOMotorClient, username: str
+) -> List[Profile]:
+    cursor = conn[database_name][followers_collection_name].find(
+        {"follower": username}
+    )
+
+    result: List[Profile] = []
+    async for item in cursor:
+        profile = await get_profile_by_username(
+            conn,
+            current_username=username,
+            target_username=item["following"],
+        )
+        print(item)
+        result.append(profile)
+
+    return result
 
 
 async def follow_for_user(

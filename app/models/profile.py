@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import AnyUrl
 
@@ -14,3 +14,7 @@ class Profile(RWModel):
 
 class ProfileInResponse(RWModel):
     profile: Profile
+
+
+class ProfilesInResponse(RWModel):
+    profiles: List[Profile]

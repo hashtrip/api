@@ -4,10 +4,11 @@ from fastapi import APIRouter, Depends, Path
 
 from ....core.jwt import get_current_user_authorizer
 from ....db.mongodb import AsyncIOMotorClient, get_database
-from ....models.profile import ProfileInResponse
+from ....models.profile import ProfileInResponse, ProfilesInResponse
 from ....models.user import User
 from ....services.profile import (
     get_profile_service,
+    get_following_service,
     follow_user_service,
     unfollow_user_service,
 )
@@ -22,6 +23,15 @@ async def retrieve_profile(
     db: AsyncIOMotorClient = Depends(get_database),
 ):
     return await get_profile_service(current_user=user, username=username, conn=db)
+
+
+@router.get("/profiles/{username}/followings", response_model=ProfilesInResponse, tags=["profiles"])
+async def retrieve_followings(
+    username: str = Path(..., min_length=1),
+    user: Optional[User] = Depends(get_current_user_authorizer(required=False)),
+    db: AsyncIOMotorClient = Depends(get_database),
+):
+    return await get_following_service(username=username, current_user=user, conn=db)
 
 
 @router.post(

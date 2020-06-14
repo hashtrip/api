@@ -2,11 +2,12 @@ from typing import Optional
 from starlette.exceptions import HTTPException
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
-from ..models.profile import ProfileInResponse
+from ..models.profile import ProfileInResponse, ProfilesInResponse
 from ..models.user import User
 from ..db.mongodb import AsyncIOMotorClient
 from ..db.repositories.profile_repository import (
     get_profile_by_username,
+    get_followings,
     follow_for_user,
     unfollow_user,
 )
@@ -19,6 +20,17 @@ async def get_profile_service(
         conn, username, current_user.username if current_user else None
     )
     return ProfileInResponse(profile=profile)
+
+
+async def get_following_service(
+    conn: AsyncIOMotorClient, *, username: str, current_user: Optional[User] = None
+) -> ProfilesInResponse:
+    profiles = await get_followings(
+        conn,
+        username=username
+    )
+
+    return ProfilesInResponse(profiles=profiles)
 
 
 async def follow_user_service(user: User, username: str, conn: AsyncIOMotorClient):
