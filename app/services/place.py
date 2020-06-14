@@ -17,7 +17,7 @@ from ..core.config import (
     users_collection_name,
     place_collection_name,
 )
-from .tag import create_tags_that_not_exist, get_tags_for_place
+from .tag import create_tags_that_not_exist, get_tags
 
 
 async def is_place_favorited_by_user(
@@ -185,7 +185,7 @@ async def get_user_places(
     async for row in place_docs:
         slug = row["slug"]
         author = await get_profile_by_username(conn, target_username=row["author_id"])
-        await get_tags_for_place(conn, slug)
+        await get_tags(conn, slug)
         favorites_count = await get_favorites_count_for_place(conn, slug)
         favorited_by_user = await is_place_favorited_by_user(conn, slug, username)
         places.append(
@@ -222,7 +222,7 @@ async def get_places_with_filters(
     async for row in rows:
         slug = row["slug"]
         author = await get_profile_by_username(conn, target_username=row["author_id"])
-        await get_tags_for_place(conn, slug)
+        await get_tags(conn, slug)
         favorites_count = await get_favorites_count_for_place(conn, slug)
         favorited_by_user = await is_place_favorited_by_user(conn, slug, username)
         places.append(

@@ -24,8 +24,8 @@ from ....services.place import (
     update_place_by_slug,
 )
 from ....services.shortcuts import (
-    check_place_for_existence_and_modifying_permissions,
-    get_place_or_404,
+    check_by_slug_for_existence_and_modifying_permissions,
+    get_by_slug_or_404,
 )
 from ....db.mongodb import AsyncIOMotorClient, get_database
 from ....models.place import (
@@ -119,7 +119,7 @@ async def update_place(
     user: User = Depends(get_current_user_authorizer()),
     db: AsyncIOMotorClient = Depends(get_database),
 ):
-    await check_place_for_existence_and_modifying_permissions(db, slug, user.username)
+    await check_by_slug_for_existence_and_modifying_permissions(db, slug, user.username)
 
     dbplace = await update_place_by_slug(db, slug, place, user.username)
     return create_aliased_response(PlaceInResponse(place=dbplace))
@@ -131,7 +131,7 @@ async def delete_place(
     user: User = Depends(get_current_user_authorizer()),
     db: AsyncIOMotorClient = Depends(get_database),
 ):
-    await check_place_for_existence_and_modifying_permissions(db, slug, user.username)
+    await check_by_slug_for_existence_and_modifying_permissions(db, slug, user.username)
 
     await delete_place_by_slug(db, slug, user.username)
 
@@ -142,7 +142,7 @@ async def favorite_place(
     user: User = Depends(get_current_user_authorizer()),
     db: AsyncIOMotorClient = Depends(get_database),
 ):
-    dbplace = await get_place_or_404(db, slug, user.username)
+    dbplace = await get_by_slug_or_404(db, slug, user.username)
     if dbplace.favorited:
         raise HTTPException(
             status_code=HTTP_400_BAD_REQUEST,
@@ -164,7 +164,7 @@ async def delete_place_from_favorites(
     user: User = Depends(get_current_user_authorizer()),
     db: AsyncIOMotorClient = Depends(get_database),
 ):
-    dbplace = await get_place_or_404(db, slug, user.username)
+    dbplace = await get_by_slug_or_404(db, slug, user.username)
 
     if not dbplace.favorited:
         raise HTTPException(
