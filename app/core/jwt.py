@@ -3,7 +3,9 @@ from typing import Optional
 
 import jwt
 from fastapi import Depends, Header
+from fastapi.security import APIKeyHeader
 from jwt import PyJWTError
+from starlette import requests
 from starlette.exceptions import HTTPException
 from starlette.status import HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
 
@@ -18,7 +20,26 @@ ALGORITHM = "HS256"
 access_token_jwt_subject = "access"
 
 
-def _get_authorization_token(authorization: str = Header(...)):
+class RWAPIKeyHeader(APIKeyHeader):
+    def __init__(
+            self,
+            *,
+            name: str = "Authorization",
+            scheme_name: str = None,
+            auto_error: bool = True
+    ) -> None:
+        super().__init__(name=name, scheme_name=scheme_name, auto_error=auto_error)
+
+    async def __call__(
+            self, request: requests.Request
+    ) -> Optional[str]:
+        try:
+            return await super().__call__(request)
+        except HTTPException:
+            return None
+
+
+def _get_authorization_token(authorization: str = Depends(RWAPIKeyHeader())):
     token_prefix, token = authorization.split(" ")
     if token_prefix != JWT_TOKEN_PREFIX:
         raise HTTPException(
