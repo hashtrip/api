@@ -7,16 +7,18 @@ from ..core.config import comments_collection_name, database_name
 from .profile import get_profile_service
 
 
-async def get_comments_for_place(
+async def get_comments(
     conn: AsyncIOMotorClient, slug: str, username: Optional[str] = None
 ) -> List[CommentInDB]:
     comments: List[CommentInDB] = []
     rows = conn[database_name][comments_collection_name].find(
-        {"slug": slug, "username": username}
+        {"slug": slug, "username": username},
+
     )
+    # TODO: Lookup for better perf
     async for row in rows:
-        author = await get_profile_service(conn, row["username"], username)
-        comments.append(CommentInDB(**row, author=author))
+        author = await get_profile_service(conn, username=username)
+        comments.append(CommentInDB(**row, author=author.profile))
     return comments
 
 
@@ -27,11 +29,11 @@ async def create_comment(
     comment_doc["slug"] = slug
     comment_doc["username"] = username
     await conn[database_name][comments_collection_name].insert_one(comment_doc)
-    author = await get_profile_service(conn, username, "")
-    return CommentInDB(**comment_doc, author=author)
+    author = await get_profile_service(conn, username=username)
+    return CommentInDB(**comment_doc, author=author.profile)
 
 
 async def delete_comment(conn: AsyncIOMotorClient, id: int, username: str):
     await conn[database_name][comments_collection_name].delete_many(
-        {"id": id, "username": username}
+        {"_id": id, "username": username}
     )

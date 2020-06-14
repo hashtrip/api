@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Callable
 
 from pydantic import EmailStr
 from starlette.exceptions import HTTPException
@@ -11,7 +11,6 @@ from starlette.status import (
 from .place import get_place_by_slug
 from .user import get_user, get_user_by_email
 from ..db.mongodb import AsyncIOMotorClient
-from ..models.place import PlaceInDB
 
 
 async def check_free_username_and_email(
@@ -35,28 +34,28 @@ async def check_free_username_and_email(
             )
 
 
-async def get_place_or_404(
-    conn: AsyncIOMotorClient, slug: str, username: Optional[str] = None
-) -> PlaceInDB:
-    searched_place = await get_place_by_slug(conn, slug, username)
-    if not searched_place:
-        raise HTTPException(
-            status_code=HTTP_404_NOT_FOUND,
-            detail=f"Article with slug '{slug}' not found",
-        )
-    return searched_place
-
-
-async def check_place_for_existence_and_modifying_permissions(
-    conn: AsyncIOMotorClient, slug: str, username: str = ""
+async def get_by_slug_or_404(
+    conn: AsyncIOMotorClient, slug: str, username: Optional[str] = None, fx: Callable = get_place_by_slug
 ):
-    searched_place = await get_place_by_slug(conn, slug, username)
-    if not searched_place:
+    searched_item = await fx(conn, slug, username)
+    if not searched_item:
+        raise HTTPException(
+            status_code=HTTP_404_NOT_FOUND,
+            detail=f"Item with slug '{slug}' not found",
+        )
+    return searched_item
+
+
+async def check_by_slug_for_existence_and_modifying_permissions(
+    conn: AsyncIOMotorClient, slug: str, username: str = "", fx: Callable = get_place_by_slug
+):
+    searched_item = await fx(conn, slug, username)
+    if not searched_item:
         raise HTTPException(
             status_code=HTTP_404_NOT_FOUND,
             detail=f"Article with slug '{slug}' not found",
         )
-    if searched_place.author.username != username:
+    if searched_item.author.username != username:
         raise HTTPException(
             status_code=HTTP_403_FORBIDDEN,
             detail="You have no permission for modifying this place",
