@@ -44,9 +44,9 @@ async def get_comment_from_post(
     user: User = Depends(get_current_user_authorizer(required=False)),
     db: AsyncIOMotorClient = Depends(get_database),
 ):
-    await get_by_slug_or_404(db, slug, user.username, fx=get_post_by_slug)
+    await get_by_slug_or_404(db, slug, user.username if user else None, fx=get_post_by_slug)
 
-    dbcomments = await get_comments(db, slug, user.username)
+    dbcomments = await get_comments(db, slug, user.username if user else False)
     return create_aliased_response(ManyCommentsInResponse(comments=dbcomments))
 
 

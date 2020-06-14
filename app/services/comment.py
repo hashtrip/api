@@ -12,12 +12,10 @@ async def get_comments(
 ) -> List[CommentInDB]:
     comments: List[CommentInDB] = []
     rows = conn[database_name][comments_collection_name].find(
-        {"slug": slug, "username": username},
-
+        {"slug": slug},  # "username": username
     )
-    # TODO: Lookup for better perf
     async for row in rows:
-        author = await get_profile_service(conn, username=username)
+        author = await get_profile_service(conn, username=row["username"])
         comments.append(CommentInDB(**row, author=author.profile))
     return comments
 
