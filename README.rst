@@ -1,14 +1,13 @@
-HashTrip Backend
+Hashtrip Backend
 ---------- 
 
+Docs can be accessed in `/docs` endpoint, for example when in local dev environment, you can access it in [localhost:8000/docs](localhost:8000/docs)
 
-Requirments
+Requirements
 ----------
 
 - MongoDB community @4.2
-- python3 ^3.7.1
-- Requirments.txt
-
+- Python3 ^3.7.1
 
 Quickstart
 ----------
@@ -65,16 +64,12 @@ Application parts are:
 ::
 
     app
-    ├── api              - web related stuff and handle routes.
-    │   ├── dependencies - dependencies for routes definition.
-    │   ├── errors       - definition of error handlers.
-    │   └── routes       - web routes.
-    ├── core             - application configuration, startup events, logging.
-    ├── db               - db related stuff. 
-    ├── models           - Business logic layer, pydantic models for this application.
-    │   ├── domain       - main models that are used almost everywhere.
-    │   └── schemas      - schemas for using in web routes.
-    ├── resources        - any additional resources data.
-    ├── services         - Application logic layer.
-    └── main.py          - FastAPI application instance, creation, and configuration.
+    ├── api               - web related stuff and handle routes.
+    │   └── api_v1        - endpoint version.
+    │       └── endpoints - definition of error routes.
+    ├── core              - application configuration, startup events, logging.
+    ├── db                - db related stuff. 
+    ├── models            - Business logic layer, pydantic models for this application.
+    ├── services          - Application logic layer.
+    └── main.py           - FastAPI application instance, creation, and configuration.
 
