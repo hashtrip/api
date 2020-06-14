@@ -10,7 +10,7 @@ from ..models.place import (
     PlaceInUpdate,
 )
 from ..db.mongodb import AsyncIOMotorClient
-from ..db.repositories.profile_repository import get_profile_by_username
+from ..db.repositories.profile_repository import get_profile_by_username, get_followings
 from ..core.config import (
     database_name,
     favorites_collection_name,
@@ -18,6 +18,7 @@ from ..core.config import (
     place_collection_name,
 )
 from .tag import create_tags_that_not_exist, get_tags
+from ..models.profile import Profile
 
 
 async def is_place_favorited_by_user(
@@ -179,9 +180,14 @@ async def get_user_places(
     conn: AsyncIOMotorClient, username: str, limit=20, offset=0
 ) -> List[PlaceInDB]:
     places: List[PlaceInDB] = []
+    followings: List[Profile] = await get_followings(
+        conn=conn, username=username,
+    )
+
+    authors = list(map(lambda x: x.username, followings))
 
     place_docs = conn[database_name][place_collection_name].find(
-        {"author_id": username}, limit=limit, skip=offset
+        {"author_id": {"$in": authors}}, limit=limit, skip=offset
     )
     async for row in place_docs:
         slug = row["slug"]
