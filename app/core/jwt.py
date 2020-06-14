@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 import jwt
-from fastapi import Depends, Header
+from fastapi import Depends
 from fastapi.security import APIKeyHeader
 from jwt import PyJWTError
 from starlette import requests
@@ -69,7 +69,7 @@ async def _get_current_user(
     return user
 
 
-def _get_authorization_token_optional(authorization: str = Header(None)):
+def _get_authorization_token_optional(authorization: str = Depends(RWAPIKeyHeader())):
     if authorization:
         return _get_authorization_token(authorization)
     return ""
