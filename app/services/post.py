@@ -99,26 +99,12 @@ async def get_post_by_slug(
     )
     if post_doc:
         post_doc["likes_count"] = await get_likes_count_for_post(conn, slug)
-        post_doc["liked"] = await is_post_liked_by_user(conn, slug, username)
+        post_doc["liked"] = await is_post_liked_by_user(conn, slug, username) if username else False
         post_doc["author"] = await get_profile_by_username(conn, target_username=post_doc["author_id"])
 
         return PostInDB(
             **post_doc, created_at=ObjectId(post_doc["_id"]).generation_time
         )
-
-
-#
-#
-# async def get_post_filters(
-#     tag: str = "",
-#     author: str = "",
-#     liked: str = "",
-#     limit: int = Query(20, gt=0),
-#     offset: int = Query(0, ge=0),
-# ) -> PostFilterParams:
-#     return PostFilterParams(
-#         tag=tag, author=author, liked=liked, limit=limit, offset=offset
-#     )
 
 
 async def create_post_by_slug(
