@@ -18,7 +18,6 @@ async def get_profile_service(
     profile = await get_profile_by_username(
         conn, username, current_user.username if current_user else None
     )
-    print(profile)
     return ProfileInResponse(profile=profile)
 
 

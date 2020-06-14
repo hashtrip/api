@@ -2,6 +2,8 @@ from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel, Field
+from bson import ObjectId
+from .util import ObjID
 
 
 class DateTimeModelMixin(BaseModel):
@@ -10,4 +12,10 @@ class DateTimeModelMixin(BaseModel):
 
 
 class DBModelMixin(DateTimeModelMixin):
-    id: Optional[int] = None
+    id: Optional[ObjID] = Field(..., alias="_id")
+
+    class Config:
+        allow_population_by_field_name = True
+        json_encoders = {
+            ObjectId: lambda x: str(x),
+        }
