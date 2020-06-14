@@ -99,7 +99,7 @@ async def get_place_by_slug(
     )
     if place_doc:
         place_doc["favorites_count"] = await get_favorites_count_for_place(conn, slug)
-        place_doc["favorited"] = await is_place_favorited_by_user(conn, slug, username)
+        place_doc["favorited"] = await is_place_favorited_by_user(conn, slug, username) if username else False
         place_doc["author"] = await get_profile_by_username(conn, target_username=place_doc["author_id"])
 
         return PlaceInDB(
@@ -179,6 +179,7 @@ async def get_user_places(
     conn: AsyncIOMotorClient, username: str, limit=20, offset=0
 ) -> List[PlaceInDB]:
     places: List[PlaceInDB] = []
+
     place_docs = conn[database_name][place_collection_name].find(
         {"author_id": username}, limit=limit, skip=offset
     )
@@ -216,7 +217,7 @@ async def get_places_with_filters(
         base_query["author"] = f'$in: ["{filters.author}]"'
 
     rows = conn[database_name][place_collection_name].find(
-        {"author_id": username}, limit=filters.limit, skip=filters.offset
+        {"author_id": filters.author} if filters.author else {}, limit=filters.limit, skip=filters.offset
     )
 
     async for row in rows:
