@@ -10,12 +10,16 @@ class Right(IntFlag):
     _X_ bit for
     X__ bit for
     """
+    CREATE_PLACE = 0
+    DELETE_SELF_PLACE = 1
+
+
+class RoleHaveRight(IntFlag):
     PUBLIC = 0b001
-    KOL = 0b010
     BUSINESS = 0b100
 
 
 class Role(RWModel):
     role: str
     description: Optional[str]
-    rights: Right = 0b1
+    rights: RoleHaveRight = 0b1
